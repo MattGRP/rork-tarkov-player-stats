@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # 如果是 React Native/Rork Pro 项目，需要安装 Node 依赖
       - name: Install Dependencies
@@ -28,7 +28,7 @@ jobs:
           
       # 将生成的 ipa 上传到 GitHub Artifacts
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: my-tarkov-ipa
           path: MyTarkov.ipa
