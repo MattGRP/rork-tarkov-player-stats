@@ -1,0 +1,34 @@
+name: iOS Build
+on:
+  push:
+    branches: [ main ] # 当 main 分支有变动时触发
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # 如果是 React Native/Rork Pro 项目，需要安装 Node 依赖
+      - name: Install Dependencies
+        run: npm install 
+
+      # 构建打包 (以 React Native 为例，原生 Swift 项目直接运行 xcodebuild)
+      - name: Build IPA
+        run: |
+          xcodebuild -workspace ios/YourApp.xcworkspace \
+                     -scheme YourApp \
+                     -configuration Release \
+                     -archivePath $PWD/build/YourApp.xcarchive \
+                     archive
+          # 将 archive 转为未签名的 ipa
+          mkdir -p Payload
+          cp -r $PWD/build/YourApp.xcarchive/Products/Applications/YourApp.app Payload/
+          zip -r YourApp.ipa Payload
+          
+      # 将生成的 ipa 上传到 GitHub Artifacts
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-tarkov-ipa
+          path: MyTarkov.ipa
