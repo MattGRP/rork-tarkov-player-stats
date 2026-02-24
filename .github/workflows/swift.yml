@@ -9,12 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. 核心步骤：使用 xcodebuild 编译 Swift 项目
-      # 注意：由于没有付费证书，我们只做编译生成 .app，后续由 AltStore 签名
+      # 1. 核心步骤：修正 Scheme 名称
       - name: Build App
         run: |
           xcodebuild build \
-            -scheme rork-tarkov-player-stats \
+            -scheme TarkovPlayerStats \
             -destination 'generic/platform=iOS' \
             -configuration Release \
             -derivedDataPath build
