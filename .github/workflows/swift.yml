@@ -1,7 +1,7 @@
 name: iOS Build
 on:
   push:
-    branches: [ main ] # 当 main 分支有变动时触发
+    branches: [ main ]
 
 jobs:
   build:
@@ -9,26 +9,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 如果是 React Native/Rork Pro 项目，需要安装 Node 依赖
-      - name: Install Dependencies
-        run: npm install 
-
-      # 构建打包 (以 React Native 为例，原生 Swift 项目直接运行 xcodebuild)
-      - name: Build IPA
+      # 1. 核心步骤：使用 xcodebuild 编译 Swift 项目
+      # 注意：由于没有付费证书，我们只做编译生成 .app，后续由 AltStore 签名
+      - name: Build App
         run: |
-          xcodebuild -workspace ios/YourApp.xcworkspace \
-                     -scheme YourApp \
-                     -configuration Release \
-                     -archivePath $PWD/build/YourApp.xcarchive \
-                     archive
-          # 将 archive 转为未签名的 ipa
+          xcodebuild build \
+            -scheme rork-tarkov-player-stats \
+            -destination 'generic/platform=iOS' \
+            -configuration Release \
+            -derivedDataPath build
+
+      # 2. 将编译产物打包成 .ipa 格式（AltStore 识别格式）
+      - name: Package IPA
+        run: |
           mkdir -p Payload
-          cp -r $PWD/build/YourApp.xcarchive/Products/Applications/YourApp.app Payload/
+          cp -r build/Build/Products/Release-iphoneos/*.app Payload/
           zip -r YourApp.ipa Payload
-          
-      # 将生成的 ipa 上传到 GitHub Artifacts
+
+      # 3. 上传结果 (已更新为 v4)
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-tarkov-ipa
+          name: tarkov-stats-ipa
           path: MyTarkov.ipa
